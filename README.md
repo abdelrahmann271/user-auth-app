@@ -49,6 +49,20 @@ Frontend (React) --> Backend (NestJS) --> MongoDB
 - Rate limiting
 - Docker support
 
+## Demo
+
+### Authentication
+
+| Sign In | Sign Up |
+|---------|---------|
+| ![Sign In](docs/screenshots/signin.png) | ![Sign Up](docs/screenshots/signup.png) |
+
+### User Flow
+
+| Sign Up (Filled) | Profile | Profile (Expanded) |
+|------------------|---------|-------------------|
+| ![Sign Up Filled](docs/screenshots/signup-filled.png) | ![Profile](docs/screenshots/profile.png) | ![Profile Expanded](docs/screenshots/profile-expanded.png) |
+
 ## Project Structure
 
 ```
