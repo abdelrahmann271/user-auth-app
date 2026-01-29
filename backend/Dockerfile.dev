@@ -1,0 +1,23 @@
+# ===========================================
+# Backend Dockerfile - Development
+# ===========================================
+# Used for hot-reload development with mounted volumes
+
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install all dependencies
+RUN npm install
+
+# Copy source code (will be overwritten by volume mount)
+COPY . .
+
+# Expose port
+EXPOSE 3001
+
+# Start in watch mode for hot reload
+CMD ["npm", "run", "start:dev"]

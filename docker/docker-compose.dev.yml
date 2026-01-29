@@ -1,0 +1,84 @@
+# ===========================================
+# Docker Compose - Development
+# ===========================================
+# Hot reload enabled, source code mounted
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7
+    container_name: easygen-mongodb-dev
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_dev_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=easy-gen-app
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME:-easygen}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD:-easygen_dev_password}
+    networks:
+      - easygen-dev-network
+    healthcheck:
+      test: ["CMD", "mongosh", "-u", "${MONGO_USERNAME:-easygen}", "-p", "${MONGO_PASSWORD:-easygen_dev_password}", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # NestJS Backend (Development)
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile.dev
+    container_name: easygen-backend-dev
+    ports:
+      - "3001:3001"
+    volumes:
+      # Mount source code for hot reload
+      - ../backend/src:/app/src
+      - ../backend/package.json:/app/package.json
+      # Exclude node_modules from mount
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - MONGODB_URI=mongodb://${MONGO_USERNAME:-easygen}:${MONGO_PASSWORD:-easygen_dev_password}@mongodb:27017/easy-gen-app?authSource=admin
+      - JWT_SECRET=${JWT_SECRET:-dev-secret-key-not-for-production}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-1800}
+      - ENABLE_SWAGGER=true
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - easygen-dev-network
+
+  # React Frontend (Development)
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile.dev
+    container_name: easygen-frontend-dev
+    ports:
+      - "5173:5173"
+    volumes:
+      # Mount source code for hot reload
+      - ../frontend/src:/app/src
+      - ../frontend/index.html:/app/index.html
+      - ../frontend/vite.config.ts:/app/vite.config.ts
+      - ../frontend/package.json:/app/package.json
+      # Exclude node_modules from mount
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:3001
+    depends_on:
+      - backend
+    networks:
+      - easygen-dev-network
+
+networks:
+  easygen-dev-network:
+    driver: bridge
+
+volumes:
+  mongodb_dev_data:
+    driver: local
