@@ -1,6 +1,25 @@
 # Easy Gen App
 
-Full-stack authentication app with NestJS, React, and MongoDB.
+A production-ready full-stack authentication application built with modern technologies. Features secure JWT-based authentication, a clean modular architecture, and Docker support for both development and production environments.
+
+## Tech Stack
+
+| Layer | Technology | Version |
+|-------|------------|---------|
+| **Frontend** | React | 19.x |
+| | TypeScript | 5.x |
+| | Vite | 7.x |
+| | React Router | 7.x |
+| | TanStack Query | 5.x |
+| | Axios | 1.x |
+| **Backend** | NestJS | 11.x |
+| | TypeScript | 5.x |
+| | Passport.js | 0.7.x |
+| | Mongoose | 9.x |
+| **Database** | MongoDB | 7.x |
+| **Infrastructure** | Docker | - |
+| | Nginx | Alpine |
+| | Node.js | 20 LTS |
 
 ## Architecture Overview
 
@@ -29,6 +48,51 @@ Frontend (React) --> Backend (NestJS) --> MongoDB
 - Request logging
 - Rate limiting
 - Docker support
+
+## Project Structure
+
+```
+easy-gen-app/
+├── backend/                    # NestJS backend application
+│   ├── src/
+│   │   ├── auth/              # Authentication module
+│   │   │   ├── dto/           # Data transfer objects
+│   │   │   ├── guards/        # JWT and Local auth guards
+│   │   │   ├── interfaces/    # TypeScript interfaces
+│   │   │   └── strategies/    # Passport strategies
+│   │   ├── users/             # Users module
+│   │   │   ├── dto/           # User DTOs
+│   │   │   └── schemas/       # Mongoose schemas
+│   │   ├── common/            # Shared utilities
+│   │   │   ├── filters/       # Exception filters
+│   │   │   └── middleware/    # Request logging
+│   │   ├── app.module.ts      # Root module
+│   │   └── main.ts            # Application entry point
+│   └── Dockerfile*            # Docker configurations
+├── frontend/                   # React frontend application
+│   ├── src/
+│   │   ├── app/               # App setup and routing
+│   │   │   └── routes/        # Route definitions
+│   │   ├── features/          # Feature-based modules
+│   │   │   ├── auth/          # Authentication feature
+│   │   │   │   ├── components/
+│   │   │   │   └── hooks/
+│   │   │   └── profile/       # User profile feature
+│   │   │       ├── components/
+│   │   │       └── hooks/
+│   │   └── shared/            # Shared code
+│   │       ├── api/           # API client setup
+│   │       ├── components/    # Reusable UI components
+│   │       ├── types/         # TypeScript types
+│   │       └── utils/         # Utility functions
+│   └── Dockerfile*            # Docker configurations
+├── docker/                     # Docker Compose files
+│   ├── docker-compose.dev.yml
+│   ├── docker-compose.prod.yml
+│   └── nginx/                 # Nginx configuration
+├── Makefile                   # Build and run commands
+└── .env.*                     # Environment configurations
+```
 
 ## Quick Start
 
@@ -67,6 +131,56 @@ make dev-local
 # then in separate terminals:
 make dev-backend
 make dev-frontend
+```
+
+### Using Docker Compose Directly
+
+If you prefer not to use make, you can run docker-compose commands directly:
+
+**Development:**
+```bash
+# Start all services
+docker compose -f docker/docker-compose.dev.yml --env-file .env.development up -d --build
+
+# View logs
+docker compose -f docker/docker-compose.dev.yml --env-file .env.development logs -f
+
+# Stop services
+docker compose -f docker/docker-compose.dev.yml --env-file .env.development down
+```
+
+Once started, access:
+- Frontend: http://localhost:5173
+- Backend: http://localhost:3001
+- Swagger: http://localhost:3001/api/docs
+- MongoDB: mongodb://localhost:27017
+
+**Production:**
+```bash
+# Start all services
+docker compose -f docker/docker-compose.prod.yml --env-file .env.production up -d --build
+
+# View logs
+docker compose -f docker/docker-compose.prod.yml --env-file .env.production logs -f
+
+# Stop services
+docker compose -f docker/docker-compose.prod.yml --env-file .env.production down
+```
+
+Once started, access:
+- Application: http://localhost
+- API: http://localhost/api
+
+**Utility commands:**
+```bash
+# Clean up (remove containers and volumes)
+docker compose -f docker/docker-compose.dev.yml down -v --remove-orphans
+
+# Open MongoDB shell (development)
+docker compose -f docker/docker-compose.dev.yml --env-file .env.development exec mongodb mongosh -u easygen -p easygen_dev_password --authenticationDatabase admin easy-gen-app
+
+# Shell into backend container
+docker compose -f docker/docker-compose.dev.yml exec backend sh
 ```
 
 ## Configuration
