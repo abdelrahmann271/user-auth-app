@@ -72,10 +72,6 @@ export default function ProfilePage() {
           <div className="profile-details">
             <h3>Profile</h3>
             <div className="profile-field">
-              <span className="label">ID:</span>
-              <span className="value">{profile.id}</span>
-            </div>
-            <div className="profile-field">
               <span className="label">Email:</span>
               <span className="value">{profile.email}</span>
             </div>
